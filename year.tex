@@ -1,0 +1,150 @@
+\documentclass{article}
+% A template for greating a year-at-a-glance layout using the tikz calendar
+% library.
+%
+% The original author of many of the tikz styles below is Berteum Damman [1].
+%
+% [1]: http://www.texample.net/tikz/examples/changing-the-default-calendar-layout/
+\usepackage[hidelinks]{hyperref}
+\usepackage[letterpaper,margin=0.3in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{verbatim}
+\usetikzlibrary{calendar}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shapes.geometric}
+% Uncomment this package to test what the PDF looks like in grayscale
+% \usepackage{xcolor}
+% \selectcolormodel{gray}
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{y}{RGB}{227,238,167}
+\definecolor{g}{RGB}{127,205,187}
+\definecolor{b}{RGB}{54,137,194}
+
+% Define the date highlights
+\newcommand{\school}{\node[fill=y,circle] {};}
+\newcommand{\district}{\node[fill=b,circle] {};}
+\newcommand{\region}{\node[fill=g,circle] {};}
+
+\begin{document}
+  \title{\vspace{-1cm}Template 2019 Year-at-a-Glance\vspace{-1cm}}
+  \date{}
+  \author{}
+
+  \maketitle
+  \thispagestyle{empty} % Remove page numbers and headers
+  \makeatletter
+
+  % This way you can define your own conditions, for example, you
+  % could make something as `full moon', `even week', `odd week',
+  % et cetera. In principle. The math in TeX could be hard.
+  \pgfkeys{/pgf/calendar/start of year/.code={%
+      \ifnum\pgfcalendarifdateday=1\relax%
+          \ifnum\pgfcalendarifdatemonth=1\relax\pgfcalendarmatchestrue\fi%
+      \fi%
+  }}%
+
+  % Define our own style
+  \tikzstyle{week list sunday}=[
+      % Note that we cannot extend from week list,
+      % the execute before day scope is cumulative
+      execute before day scope={%
+             \ifdate{day of month=1}{\ifdate{equals=\pgfcalendarbeginiso}{}{
+             % On first of month, except when first date in calendar.
+                 \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@month@yshift}%
+                 \pgftransformyshift{-\pgf@y}
+             }}{}%
+      },
+      execute at begin day scope={%
+          % Because for TikZ Monday is 0 and Sunday is 6,
+          % we can't directly use \pgfcalendercurrentweekday,
+          % but instead we define \c@pgf@counta (basically) as:
+          % (\pgfcalendercurrentweekday + 1) % 7
+          \pgfmathsetlength\pgf@x{\tikz@lib@cal@xshift}%
+          \ifnum\pgfcalendarcurrentweekday=6
+              \c@pgf@counta=0
+          \else
+              \c@pgf@counta=\pgfcalendarcurrentweekday
+              \advance\c@pgf@counta by 1
+          \fi
+          \pgf@x=\c@pgf@counta\pgf@x
+          % Shift to the right position for the day.
+          \pgftransformxshift{\pgf@x}
+      },
+      execute after day scope={
+          % Week is done, shift to the next line.
+          \ifdate{Saturday}{
+              \pgfmathsetlength{\pgf@y}{\tikz@lib@cal@yshift}%
+              \pgftransformyshift{-\pgf@y}
+          }{}%
+      },
+      % This should be defined, glancing from the source code.
+      tikz@lib@cal@width=7
+  ]
+
+  \makeatother
+
+\begin{minipage}{0.28\linewidth}
+  % The actual calendar is now rather easy:
+  \begin{tikzpicture}[every calendar/.style={
+      month label left,
+      month text={\%mt},
+      month yshift=0pt,
+      if={(Sunday) [blue!100]},
+      week list sunday,
+    },
+    every day/.style={anchor=base},
+    day text={\%d=},rounded corners=0,anchor=base,text height=1ex,text depth=-0.5ex
+    ]\small
+    \matrix[column sep=0em, row sep=0em] {
+      \calendar[dates=2019-01-01 to 2019-12-last]
+      if (equals=2019-03-30) {\school}%
+      if (equals=2019-05-03) {\school}%
+      if (equals=2019-05-04) {\school}%
+      if (equals=2019-07-04) {\school}%
+      if (equals=2019-10-11) {\school}%
+      if (equals=2019-10-12) {\school}%
+      if (equals=2019-11-30) {\district}%
+      if (equals=2019-12-01) {\district}%
+      if (equals=2019-12-02) {\district}%
+      if (equals=2019-12-03) {\district}%
+      if (equals=2019-12-04) {\district}%
+      if (equals=2019-04-06) {\region}%
+      if (equals=2019-04-07) {\region}%
+      if (equals=2019-10-05) {\region}%
+      if (equals=2019-10-06) {\region}%
+      ; \\
+    };
+  \end{tikzpicture}
+
+\end{minipage}
+\begin{minipage}[t]{0.65\linewidth}
+\subsection*{Important Dates}
+\begin{itemize}[itemsep=1pt]
+  \item[\begin{tikzpicture}\school\end{tikzpicture}] Mar 30: Spring Dance at Easter Meadow
+  \item[\begin{tikzpicture}\region\end{tikzpicture}] Apr 6--7: Region Officer Applicant Interviews
+  \item[\begin{tikzpicture}\school\end{tikzpicture}] May 3--4: Band Camp
+  \item[\begin{tikzpicture}\school\end{tikzpicture}] Jul 4: Independence Day Celebration at the Stadium
+  \item[\begin{tikzpicture}\region\end{tikzpicture}] Oct 5--6: Nominations for Region Officer
+  \item[\begin{tikzpicture}\school\end{tikzpicture}] Oct 11--12: Field Trip to Washington D.C.
+  \item[\begin{tikzpicture}\district\end{tikzpicture}] Nov 30--Dec 4: District Fundraising Competition
+\end{itemize}
+\end{minipage}
+
+  \begin{center}
+    \begin{tabular}{llll}
+      \begin{tikzpicture}\school\end{tikzpicture} School Events &
+      \begin{tikzpicture}\district\end{tikzpicture} District Events &
+      \begin{tikzpicture}\region\end{tikzpicture} Region Events \\
+    \end{tabular}
+
+    \vspace{0.5em}
+    Find the full, up-to-date calendar at \href{https://www.example.com}{www.example.com}
+
+    \vspace{0.5em}
+    \footnotesize{This printout was last updated on \today.}
+  \end{center}
+\end{document}
