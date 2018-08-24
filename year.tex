@@ -39,15 +39,6 @@
   \thispagestyle{empty} % Remove page numbers and headers
   \makeatletter
 
-  % This way you can define your own conditions, for example, you
-  % could make something as `full moon', `even week', `odd week',
-  % et cetera. In principle. The math in TeX could be hard.
-  \pgfkeys{/pgf/calendar/start of year/.code={%
-      \ifnum\pgfcalendarifdateday=1\relax%
-          \ifnum\pgfcalendarifdatemonth=1\relax\pgfcalendarmatchestrue\fi%
-      \fi%
-  }}%
-
   % Define our own style
   \tikzstyle{week list sunday}=[
       % Note that we cannot extend from week list,
