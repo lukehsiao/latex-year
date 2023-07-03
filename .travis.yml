@@ -1,9 +1,0 @@
-notifications:
-  email: false
-
-before_install:
-  - sudo apt-get update
-install:
-  - sudo apt-get install texlive-full texlive-xetex latexmk
-script:
-  - make
